@@ -1,0 +1,34 @@
+# centos7-ssh-v1.0
+# author xugang
+
+FROM centos:7
+RUN yum makecache fast && yum -y update glibc
+RUN yum  install -y  openssh-server vim tar wget curl rsync bzip2 iptables tcpdump less telnet net-tools lsof
+
+RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N '' \
+&& ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -N '' \
+&& ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N '' \
+&& ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N '' \
+&& echo 'RSAAuthentication yes' >> /etc/ssh/sshd_config \
+&& echo 'PubkeyAuthentication yes' >> /etc/ssh/sshd_config
+
+RUN yum clean all
+
+RUN mkdir /var/run/sshd
+
+EXPOSE 22
+
+RUN echo "123456" | passwd root --stdin
+
+#CMD ["/usr/sbin/sshd","-D"] 
+
+ENTRYPOINT ["/usr/sbin/sshd","-D"] 
+ 
+
+# 构建镜像
+#docker image build -t centosx:1.1 .
+#启动容器
+docker run -itd --name os1 -p 10000:22 centosx:1.1
+
+
+
